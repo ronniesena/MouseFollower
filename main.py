@@ -16,7 +16,7 @@ def main():
     alyssa = unit.unit("alyssa", IMAGES_DIR + "alyssa")
     zoe    = unit.unit("zoe", IMAGES_DIR + "zoe")
 
-    player = alyssa
+    player = ronnie
     
     robsHouse = scene.scene(IMAGES_DIR + "background.png")
     tv = pygame.image.load(IMAGES_DIR + "tvback.png")
@@ -76,7 +76,8 @@ def main():
         
             
         print player.x,  player.y
-        
+        print robsHouse.zCounter
+  
         
         #TODO: IF THERE IS NO MSG AVAILABLE DONT PRINT THE TEXT BOX..
             
