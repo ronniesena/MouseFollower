@@ -1,7 +1,7 @@
 import pygame, sys, os
 
 class unit(pygame.sprite.Sprite):
-    def __init__(self, name, filePath):
+    def __init__(self, name, filePath, health):
         self.x = 0
         self.y = 205
         self.idleList = []
@@ -11,7 +11,9 @@ class unit(pygame.sprite.Sprite):
         self.counter = 0
         self.isFlipped = False
         self.name = name
-
+        self.health = health
+        self.isHit = False
+        
         
         #Load files to idleList
         for item in os.listdir(filePath + "\\idle"):
@@ -27,9 +29,10 @@ class unit(pygame.sprite.Sprite):
             
         
         
-    def update(self, surface, imgList):
+    def update(self, surface, imgList, x, y):
        
-        
+        self.x = x
+        self.y = y
         
         
         #Using a counter to make the image switch slower.
@@ -61,10 +64,15 @@ class unit(pygame.sprite.Sprite):
         elif imgList == self.idleList:
             self.image = imgList[self.index]
         
+        self.rect = pygame.Rect(self.x,self.y, 56,128)
         
         if self.isFlipped == True:
         
             self.image = pygame.transform.flip(self.image, 1, 0)
+        
+        
+        
+        
         
         surface.blit(self.image, (self.x, self.y))
         
