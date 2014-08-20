@@ -29,21 +29,24 @@ def main():
     
     counter = 0
    
-    def isHit(): #TRYING TO CREATE A STATE OF INVISIBLITY WHEN HIT.. 
-        hitCounter = 5
-        if player.rect.colliderect(monster.rect) or hitCounter > 0:
-            hitCounter -= 1
-            return True
-            
-        else:
-            return False
-        
-        
+
+    def resetStats():
+        player.currentHP = player.maxHP
+        player.x = 0
+        player.y = 205
+        player.hitCounter = 16
+        player.bounceCounter = 10
+
+        robsHouse.sysEvent = False
+        robsHouse.userEvent = False
+
+
     
     
     
     def charSelection():
-        
+
+
         fontType = pygame.font.SysFont("Pixelated Regular", 55)
         textbox = pygame.image.load(IMAGES_DIR + "textbox.png")
         
@@ -61,7 +64,7 @@ def main():
     
         screen.blit(textbox, (25,5))
         screen.blit(fontType.render("SELECT YOUR CHARACTER", 0, (0,0,0,)), (55,45))
-    
+
     
     arrowCoord = [(130,210), (290,170), (410, 190), (480, 230)]
     arrowIndex = 0
@@ -80,7 +83,7 @@ def main():
         
         #Character Selection Screen
         if charSelected == False:
-            
+
             
             charSelection()
             
@@ -108,16 +111,17 @@ def main():
                         elif arrowIndex == 3:
                             player = ronnie
                             
-                        player.health = 10
+                        #player.maxHP = 10
+                        resetStats()
                         charSelected = True
-                        player.x = 0
-                        player.y = 205            
-            
+
+
             screen.blit(arrow, arrowCoord[arrowIndex])
             
             
         #Main Game 
         else:
+
             useList = player.idleList
             robsHouse.update(screen)
             robsHouse.checkIfMsg(player)
@@ -131,27 +135,24 @@ def main():
                     pygame.quit()
                 if event.type == pygame.KEYDOWN:
                         
-                    if event.key == pygame.K_z and robsHouse.pressed == False and robsHouse.msgAvail == True:
-                        robsHouse.pressed = True
-                    elif event.key == pygame.K_z and robsHouse.pressed == True:
+                    if event.key == pygame.K_z and robsHouse.userEvent == False and robsHouse.msgAvail == True:
+                        robsHouse.userEvent = True
+                    elif event.key == pygame.K_z and robsHouse.userEvent == True:
                         robsHouse.list1 = []
                         robsHouse.list2 = []
                         #robsHouse.text = ""
                         robsHouse.textCounter = 0
-                        robsHouse.pressed = False
+                        robsHouse.userEvent = False
                         
                     elif event.key == pygame.K_ESCAPE:
                         charSelected = False
                     elif event.key == pygame.K_f:
-                        player.health -= 5
-                    
-            
-                
-                        
+                        player.currentHP -= 5
+
             
                  
-            #If "z" isnt pressed down, then move.. if not you cant move
-            if robsHouse.pressed == False:     
+
+            if robsHouse.userEvent == False and robsHouse.sysEvent == False:
                 if key[pygame.K_RIGHT]:
                     if player.x < (reso[0] - 128):
                         player.isFlipped = False
@@ -173,33 +174,43 @@ def main():
                         player.y += 5
           
             
-            if player.health <= 0:
+            if player.currentHP <= 0:
                 charSelected = False
+                #player.currentHP = player.maxHP
                                 
             
-                
+            
+            if player.rect.colliderect(monster.rect) and player.isHit == False:
+                player.immuneCount()
+                player.currentHP -= 1
+
+            elif player.isHit:
+                player.immuneCount()
+
+            if player.hitCounter >= 3 and player.hitCounter < 16: #Countdown while being in "hit state".
+                robsHouse.sysEvent = True
+                if player.bounceCounter > 0:
+                    player.bounceBack()
+            else:
+                robsHouse.sysEvent = False
+                player.bounceBounce = 10
             monster.update(screen, monster.idleList, monster.x, monster.y)
-            
-            player.update(screen, useList, player.x, player.y)
-            
-            if player.rect.colliderect(monster.rect):
-                player.health -= 1
-                player.x -= 20
+
+            if player.hitCounter % 2 == 0: #Flashing effect when damaged.
+                player.update(screen, useList, player.x, player.y)
+
             screen.blit(tv, (380,305))
-            #TRYING TO MAKE YOU GET KNOCKED BACKIF YOU HIT AN ENEMY
-            if robsHouse.pressed == True:
+
+            if robsHouse.userEvent == True:
                 robsHouse.printText(screen, player)
             
-            
-                
-            
-            print player.health
-            print player.rect
-            print monster.rect
-            
-        
-        
-        
+            print "HP: " + str(player.currentHP) + "/" +str(player.maxHP)
+            print "sys: " + str(robsHouse.sysEvent)
+            print "user: " + str(robsHouse.userEvent)
+            print player.bounceCounter
+            #print player.rect
+            #print monster.rect
+
         pygame.display.flip()
 if __name__ == '__main__': 
         main()
